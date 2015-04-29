@@ -25,7 +25,7 @@ Usage
 #  Distributed under the terms of the BSD License.  The full license is in
 #  the file COPYING, distributed as part of this software.
 #-----------------------------------------------------------------------------
- 
+from __future__ import print_function 
 import sys
 import tempfile
 from glob import glob
@@ -108,10 +108,10 @@ class TikzMagics(Magics):
         try:
             retcode = call("pdflatex -shell-escape tikz.tex", shell=True)
             if retcode != 0:
-                print >> sys.stderr, "LaTeX terminated with signal", -retcode
+                print("LaTeX terminated with signal", -retcode, file=sys.stderr)
                 ret_log = True
         except OSError as e:
-            print >> sys.stderr, "LaTeX execution failed:", e
+            print("LaTeX execution failed:", e, file=sys.stderr)
             ret_log = True
         
         # in case of error return LaTeX log
@@ -121,7 +121,7 @@ class TikzMagics(Magics):
                 log = f.read()
                 f.close()
             except IOError:
-                print >> sys.stderr, "No log file generated."
+                print("No log file generated.", file=sys.stderr)
         
         chdir(current_dir)
     
@@ -135,9 +135,9 @@ class TikzMagics(Magics):
         try:
             retcode = call("pdf2svg tikz.pdf tikz.svg", shell=True)
             if retcode != 0:
-                print >> sys.stderr, "pdf2svg terminated with signal", -retcode
+                print("pdf2svg terminated with signal", -retcode, file=sys.stderr)
         except OSError as e:
-            print >> sys.stderr, "pdf2svg execution failed:", e
+            print("pdf2svg execution failed:", e, file=sys.stderr)
         
         chdir(current_dir)
         
@@ -149,9 +149,9 @@ class TikzMagics(Magics):
         try:
             retcode = call("convert tikz.png -quality 100 -background white -flatten tikz.jpg", shell=True)
             if retcode != 0:
-                print >> sys.stderr, "convert terminated with signal", -retcode
+                print("convert terminated with signal", -retcode, file=sys.stderr)
         except OSError as e:
-            print >> sys.stderr, "convert execution failed:", e
+            print("convert execution failed:", e, file=sys.stderr)
  
         chdir(current_dir)
         
@@ -236,7 +236,7 @@ class TikzMagics(Magics):
  
         # generate plots in a temporary directory
         plot_dir = tempfile.mkdtemp().replace('\\', '/')
-        #print(plot_dir)
+        #print(plot_dir, file=sys.stderr)
         
         if args.scale is not None:
             scale = args.scale
@@ -318,7 +318,7 @@ class TikzMagics(Magics):
             display_data.append((key, {plot_mime_type: image}))
  
         except IOError:
-            print >> sys.stderr, "No image generated."
+            print("No image generated.", file=sys.stderr)
         
         # Copy output file if requested
         if args.save is not None:
