@@ -292,20 +292,22 @@ class TikzMagics(Magics):
         ''')
         
         code = ' '.join(tex)
-        text_output = self._run_latex(code, plot_dir)
+        latex_log = self._run_latex(code, plot_dir)
         
+        key = 'TikZMagic.Tikz'
+        display_data = []
+
+        # If the latex error log exists, then image generation has failed.
+        # Publish error log and return immediately
+        if latex_log:
+            self._publish_display_data(source=key, data={'text/plain': latex_log})
+            return
+
         if plot_format == 'jpg' or plot_format == 'jpeg':
             self._convert_png_to_jpg(plot_dir)
         elif plot_format == 'svg':
             self._convert_pdf_to_svg(plot_dir)
-        
-        key = 'TikZMagic.Tikz'
-        display_data = []
- 
-        # Publish text output
-        if text_output:
-            display_data.append((key, {'text/plain': text_output}))
- 
+
         image_filename = "%s/tikz.%s" % (plot_dir, plot_format)
         
         # Publish image
