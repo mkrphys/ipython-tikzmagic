@@ -1,0 +1,24 @@
+\draw [style=help lines, step=2]        (-1,-1) grid    (+7,+7);
+\draw [line width=0.5mm, fill=blue!40!white]  (+2,+2) rectangle (+4,+4);
+ 
+\draw [blue!60!white] (  2,  2) node[anchor=north east] {$(i  ,j  )$};
+\draw [blue!60!white] (  4,  2) node[anchor=north west] {$(i+1,j  )$};
+\draw [blue!60!white] (  4,  4) node[anchor=south west] {$(i+1,j+1)$};
+\draw [blue!60!white] (  2,  4) node[anchor=south east] {$(i  ,j+1)$};
+
+\filldraw [color=gray]  (0,0) circle (.1);
+\filldraw [color=gray]  (0,2) circle (.1);
+\filldraw [color=gray]  (0,4) circle (.1);
+\filldraw [color=gray]  (0,6) circle (.1);
+\filldraw [color=gray]  (2,0) circle (.1);
+\filldraw [color=black] (2,2) circle (.1);
+\filldraw [color=black] (2,4) circle (.1);
+\filldraw [color=gray]  (2,6) circle (.1);
+\filldraw [color=gray]  (4,0) circle (.1);
+\filldraw [color=black] (4,2) circle (.1);
+\filldraw [color=black] (4,4) circle (.1);
+\filldraw [color=gray]  (4,6) circle (.1);
+\filldraw [color=gray]  (6,0) circle (.1);
+\filldraw [color=gray]  (6,2) circle (.1);
+\filldraw [color=gray]  (6,4) circle (.1);
+\filldraw [color=gray]  (6,6) circle (.1);

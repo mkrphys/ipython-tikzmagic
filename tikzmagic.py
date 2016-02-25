@@ -29,11 +29,11 @@ from __future__ import print_function
 import sys
 import tempfile
 from glob import glob
-from os import chdir, getcwd
+from os import chdir, getcwd, environ, pathsep
 from subprocess import call
 from shutil import rmtree, copy
 from xml.dom import minidom
- 
+
 from IPython.core.displaypub import publish_display_data
 from IPython.core.magic import (Magics, magics_class, line_magic,
                                 line_cell_magic, needs_local_scope)
@@ -42,7 +42,7 @@ from IPython.core.magic_arguments import (
     argument, magic_arguments, parse_argstring
 )
 from IPython.utils.py3compat import unicode_to_str
- 
+
 _mimetypes = {'png' : 'image/png',
               'svg' : 'image/svg+xml',
               'jpg' : 'image/jpeg',
@@ -92,28 +92,39 @@ class TikzMagics(Magics):
         svg.setAttribute('width', '%dpx' % width)
         svg.setAttribute('height', '%dpx' % height)
         return svg.toxml()
-    
-    
+
+
     def _run_latex(self, code, dir):
         f = open(dir + '/tikz.tex', 'w')
         f.write(code)
         f.close()
-        
+
         current_dir = getcwd()
         chdir(dir)
-        
+
         ret_log = False
         log = None
-        
+
+        # Set the TEXINPUTS environment variable, which allows the tikz code
+        # to refence files relative to the notebook (includes, packages, ...)
+        env = environ.copy()
+        if 'TEXINPUTS' in env:
+            env['TEXINPUTS'] =  current_dir + pathsep + env['TEXINPUTS']
+        else:
+            env['TEXINPUTS'] =  '.' + pathsep + current_dir + pathsep*2
+            # note that the trailing double pathsep will insert the standard
+            # search path (otherwise we would lose access to all packages)
+
         try:
-            retcode = call("pdflatex -shell-escape tikz.tex", shell=True)
+            retcode = call("pdflatex -shell-escape tikz.tex", shell=True,
+                           env=env)
             if retcode != 0:
                 print("LaTeX terminated with signal", -retcode, file=sys.stderr)
                 ret_log = True
         except OSError as e:
             print("LaTeX execution failed:", e, file=sys.stderr)
             ret_log = True
-        
+
         # in case of error return LaTeX log
         if ret_log:
             try:
@@ -122,12 +133,12 @@ class TikzMagics(Magics):
                 f.close()
             except IOError:
                 print("No log file generated.", file=sys.stderr)
-        
+
         chdir(current_dir)
-    
+
         return log
-    
- 
+
+
     def _convert_pdf_to_svg(self, dir):
         current_dir = getcwd()
         chdir(dir)
