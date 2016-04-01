@@ -43,6 +43,9 @@ from IPython.core.magic_arguments import (
 )
 from IPython.utils.py3compat import unicode_to_str
 
+__author__ = "Michael Kraus"
+__version__ = "0.1.0"
+
 _mimetypes = {'png' : 'image/png',
               'svg' : 'image/svg+xml',
               'jpg' : 'image/jpeg',
