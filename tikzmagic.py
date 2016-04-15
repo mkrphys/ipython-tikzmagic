@@ -191,7 +191,7 @@ class TikzMagics(Magics):
         )
     @argument(
         '-p', '--package', action='store',
-        help='LaTeX packages to load, separated by comma, e.g., -p pdfplot,textcomp.'
+        help='LaTeX packages to load, separated by comma, e.g., -p pgfplot,textcomp.'
         )
  
     @needs_local_scope
