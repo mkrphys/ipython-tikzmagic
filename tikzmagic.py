@@ -189,6 +189,10 @@ class TikzMagics(Magics):
         '-S', '--save', action='store',
         help='Save a copy to "filename".'
         )
+    @argument(
+        '-p', '--package', action='store',
+        help='LaTeX packages to load, separated by comma, e.g., -p pdfplot,textcomp.'
+        )
  
     @needs_local_scope
     @argument(
@@ -271,6 +275,11 @@ class TikzMagics(Magics):
         else:
             tikz_library = None
  
+        if args.package is not None:
+            latex_package = args.package.split(',')
+        else:
+            latex_package = None
+ 
         add_params = ""
         
         if plot_format == 'png' or plot_format == 'jpg' or plot_format == 'jpeg':
@@ -283,6 +292,12 @@ class TikzMagics(Magics):
 \\documentclass[convert={%(add_params)ssize=%(width)sx%(height)s,outext=.png},border=0pt]{standalone}
 \\usepackage{tikz}
         ''' % locals())
+        
+        if latex_package is not None:
+            for pkg in latex_package:
+                tex.append('''
+\\usepackage{%s}
+                ''' % pkg)
         
         if tikz_library is not None:
             for lib in tikz_library:
