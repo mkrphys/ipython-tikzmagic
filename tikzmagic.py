@@ -25,7 +25,7 @@ Usage
 #  Distributed under the terms of the BSD License.  The full license is in
 #  the file COPYING, distributed as part of this software.
 #-----------------------------------------------------------------------------
-from __future__ import print_function 
+from __future__ import print_function
 import sys
 import tempfile
 from glob import glob
@@ -196,7 +196,11 @@ class TikzMagics(Magics):
         '-p', '--package', action='store',
         help='LaTeX packages to load, separated by comma, e.g., -p pgfplots,textcomp.'
         )
- 
+    @argument(
+        '-e', '--encoding', action='store',
+        help='text encoding, e.g., -p utf-8'
+        )
+
     @needs_local_scope
     @argument(
         'code',
@@ -321,6 +325,10 @@ class TikzMagics(Magics):
         ''')
         
         code = ' '.join(tex)
+
+        if args.encoding is not None:
+            code = code.encode(args.encoding)
+
         latex_log = self._run_latex(code, plot_dir)
         
         key = 'TikZMagic.Tikz'
