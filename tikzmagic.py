@@ -26,6 +26,7 @@ Usage
 #  the file COPYING, distributed as part of this software.
 #-----------------------------------------------------------------------------
 from __future__ import print_function
+from builtins import str
 import sys
 import tempfile
 from glob import glob
@@ -98,8 +99,11 @@ class TikzMagics(Magics):
 
 
     def _run_latex(self, code, dir):
-        f = open(dir + '/tikz.tex', 'w')
-        f.write(code)
+        f = open(str(dir) + '/tikz.tex', 'w')
+        if sys.version_info[0] >= 3:
+            f.write(code.decode())
+        else:
+            f.write(code)
         f.close()
 
         current_dir = getcwd()
