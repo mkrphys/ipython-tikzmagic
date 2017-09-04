@@ -100,10 +100,10 @@ class TikzMagics(Magics):
 
     def _run_latex(self, code, dir):
         f = open(str(dir) + '/tikz.tex', 'w')
-        if sys.version_info[0] >= 3:
-            f.write(code.decode())
-        else:
+        try:
             f.write(code)
+        except Exception:
+            f.write(code.decode())
         f.close()
 
         current_dir = getcwd()
