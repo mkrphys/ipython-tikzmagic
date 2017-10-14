@@ -5,8 +5,6 @@ try:
 except ImportError:
     from distutils.core import setup
 
-import tikzmagic
-
 classifiers = [
     "Programming Language :: Python :: 2",
     "Programming Language :: Python :: 3",
@@ -21,14 +19,20 @@ classifiers = [
 with open("README.md", "r") as fp:
     long_description = fp.read()
 
+__author__ = "Michael Kraus"
+__version__ = "0.1.1"
+
 setup(
     name="ipython-tikzmagic",
-    version=tikzmagic.__version__,
-    author=tikzmagic.__author__,
+    version=__version__,
+    author=__author__,
     url="https://github.com/mkrphys/ipython-tikzmagic",
     py_modules=["tikzmagic"],
     description="IPython magics for generating figures with TikZ",
     long_description=long_description,
     license="BSD",
-    classifiers=classifiers
+    classifiers=classifiers,
+    install_requires=[
+        "ipython",
+    ]
 )
