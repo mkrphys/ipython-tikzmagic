@@ -101,8 +101,8 @@ class TikzMagics(Magics):
         return svg.toxml()
 
 
-    def _run_latex(self, code, dir):
-        f = open(dir + '/tikz.tex', 'w')
+    def _run_latex(self, code, encoding, dir):
+        f = open(dir + '/tikz.tex', 'w', encoding=encoding)
         f.write(code)
         f.close()
 
@@ -255,6 +255,7 @@ class TikzMagics(Magics):
         size = args.size
         width, height = size.split(',')
         plot_format = args.format
+        encoding = args.encoding
         tikz_library = args.library.split(',')
         latex_package = args.package.split(',')
  
@@ -311,12 +312,9 @@ class TikzMagics(Magics):
 \\end{document}
         ''')
         
-        code = ' '.join(tex)
+        code = str('').join(tex)
 
-        if args.encoding is not None:
-            code = code.encode(args.encoding)
-
-        latex_log = self._run_latex(code, plot_dir)
+        latex_log = self._run_latex(code, encoding, plot_dir)
         
         key = 'TikZMagic.Tikz'
         display_data = []
