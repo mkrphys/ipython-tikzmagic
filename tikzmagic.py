@@ -267,7 +267,7 @@ class TikzMagics(Magics):
             code = cell
             return_output = False
  
-        code = ' '.join(args.code) + code
+        code = str('').join(args.code) + code
  
         # if there is no local namespace then default to an empty dict
         if local_ns is None:
@@ -275,14 +275,11 @@ class TikzMagics(Magics):
  
         # generate plots in a temporary directory
         plot_dir = tempfile.mkdtemp().replace('\\', '/')
-        #print(plot_dir, file=sys.stderr)
         
         add_params = ""
         
         if plot_format == 'png' or plot_format == 'jpg' or plot_format == 'jpeg':
             add_params += "density=300,"
-        
-#\\documentclass[convert={%(add_params)ssize=%(width)sx%(height)s,outext=.%(plot_format)s},border=0pt]{standalone}
         
         tex = []
         tex.append('''
