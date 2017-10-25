@@ -43,8 +43,12 @@ from IPython.core.magic_arguments import (
 )
 from IPython.utils.py3compat import unicode_to_str
 
-__author__ = "Michael Kraus"
-__version__ = "0.1.0"
+try:
+    import pkg_resources  # part of setuptools
+    __version__ = pkg_resources.require("ipython-tikzmagic")[0].version
+except ImportError:
+    __version__ = 'unknown'
+
 
 _mimetypes = {'png' : 'image/png',
               'svg' : 'image/svg+xml',
