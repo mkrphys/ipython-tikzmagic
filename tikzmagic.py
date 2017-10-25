@@ -123,8 +123,7 @@ class TikzMagics(Magics):
             # search path (otherwise we would lose access to all packages)
 
         try:
-            retcode = call("pdflatex -shell-escape tikz.tex", shell=True,
-                           env=env)
+            retcode = call("pdflatex --shell-escape tikz.tex", shell=True, env=env)
             if retcode != 0:
                 print("LaTeX terminated with signal", -retcode, file=sys.stderr)
                 ret_log = True
