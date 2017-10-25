@@ -300,6 +300,11 @@ class TikzMagics(Magics):
 \\usetikzlibrary{%s}
             ''' % lib)
         
+        if args.preamble is not None:
+            tex.append('''
+%s
+            ''' % args.preamble)
+        
         tex.append('''
 \\begin{document}
 \\begin{tikzpicture}[scale=%(scale)s]
