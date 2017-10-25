@@ -177,32 +177,36 @@ class TikzMagics(Magics):
     @skip_doctest
     @magic_arguments()
     @argument(
-        '-sc', '--scale', action='store',
+        '-sc', '--scale', action='store', type=str, default=1,
         help='Scaling factor of plots. Default is "--scale 1".'
         )
     @argument(
-        '-s', '--size', action='store',
-        help='Pixel size of plots, "width,height". Default is "-s 400,240".'
+        '-s', '--size', action='store', type=str, default='400,240',
+        help='Pixel size of plots, "width,height". Default is "--size 400,240".'
         )
     @argument(
-        '-f', '--format', action='store',
+        '-f', '--format', action='store', type=str, default='png',
         help='Plot format (png, svg or jpg).'
         )
     @argument(
-        '-l', '--library', action='store',
-        help='TikZ libraries to load, separated by comma, e.g., -l matrix,arrows.'
+        '-e', '--encoding', action='store', type=str, default='utf-8',
+        help='Text encoding, e.g., -e utf-8.'
         )
     @argument(
-        '-S', '--save', action='store',
-        help='Save a copy to "filename".'
+        '-x', '--preamble', action='store', type=str, default='',
+        help='LaTeX preamble to insert before tikz figure, e.g., -x $preamble, with preamble some string variable.'
         )
     @argument(
-        '-p', '--package', action='store',
+        '-p', '--package', action='store', type=str, default='',
         help='LaTeX packages to load, separated by comma, e.g., -p pgfplots,textcomp.'
         )
     @argument(
-        '-e', '--encoding', action='store',
-        help='text encoding, e.g., -p utf-8'
+        '-l', '--library', action='store', type=str, default='',
+        help='TikZ libraries to load, separated by comma, e.g., -l matrix,arrows.'
+        )
+    @argument(
+        '-S', '--save', action='store', type=str, default=None,
+        help='Save a copy to file, e.g., -S filename. Default is None'
         )
 
     @needs_local_scope
@@ -244,7 +248,15 @@ class TikzMagics(Magics):
                 ...: (m-2-1) edge node [below] {$cd$} (m-2-2);
         
         '''
+        
+        # read arguments
         args = parse_argstring(self.tikz, line)
+        scale = args.scale
+        size = args.size
+        width, height = size.split(',')
+        plot_format = args.format
+        tikz_library = args.library.split(',')
+        latex_package = args.package.split(',')
  
         # arguments 'code' in line are prepended to the cell lines
         if cell is None:
@@ -264,33 +276,6 @@ class TikzMagics(Magics):
         plot_dir = tempfile.mkdtemp().replace('\\', '/')
         #print(plot_dir, file=sys.stderr)
         
-        if args.scale is not None:
-            scale = args.scale
-        else:
-            scale = '1'
- 
-        if args.size is not None:
-            size = args.size
-        else:
-            size = '400,240'
- 
-        width, height = size.split(',')
-        
-        if args.format is not None:
-            plot_format = args.format
-        else:
-            plot_format = 'png'
- 
-        if args.library is not None:
-            tikz_library = args.library.split(',')
-        else:
-            tikz_library = None
- 
-        if args.package is not None:
-            latex_package = args.package.split(',')
-        else:
-            latex_package = None
- 
         add_params = ""
         
         if plot_format == 'png' or plot_format == 'jpg' or plot_format == 'jpeg':
@@ -304,17 +289,15 @@ class TikzMagics(Magics):
 \\usepackage{tikz}
         ''' % locals())
         
-        if latex_package is not None:
-            for pkg in latex_package:
-                tex.append('''
+        for pkg in latex_package:
+            tex.append('''
 \\usepackage{%s}
-                ''' % pkg)
+            ''' % pkg)
         
-        if tikz_library is not None:
-            for lib in tikz_library:
-                tex.append('''
+        for lib in tikz_library:
+            tex.append('''
 \\usetikzlibrary{%s}
-                ''' % lib)
+            ''' % lib)
         
         tex.append('''
 \\begin{document}
