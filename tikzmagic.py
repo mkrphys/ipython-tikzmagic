@@ -211,6 +211,9 @@ class TikzMagics(Magics):
     @argument('-i', '--imagemagick', action='store', type=str, default='convert',
         help='Name of ImageMagick executable, optionally with full path. Default is "convert"'
         )
+    @argument('-po', '--pictureoptions', action='store', type=str, default='',
+        help='Additional arguments to pass to the \\tikzpicture command.'
+        )
 
     @needs_local_scope
     @argument(
@@ -262,6 +265,7 @@ class TikzMagics(Magics):
         tikz_library = args.library.split(',')
         latex_package = args.package.split(',')
         imagemagick_path = args.imagemagick
+        picture_options = args.pictureoptions
  
         # arguments 'code' in line are prepended to the cell lines
         if cell is None:
@@ -308,7 +312,7 @@ class TikzMagics(Magics):
         
         tex.append('''
 \\begin{document}
-\\begin{tikzpicture}[scale=%(scale)s]
+\\begin{tikzpicture}[scale=%(scale)s,%(picture_options)s]
         ''' % locals())
         
         tex.append(code)
