@@ -193,7 +193,7 @@ class TikzMagics(Magics):
         )
     @argument(
         '-x', '--preamble', action='store', type=str, default='',
-        help='LaTeX preamble to insert before tikz figure, e.g., -x $preamble, with preamble some string variable.'
+        help='LaTeX preamble to insert before tikz figure, e.g., -x "$preamble", with preamble some string variable.'
         )
     @argument(
         '-p', '--package', action='store', type=str, default='',
