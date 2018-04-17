@@ -159,12 +159,13 @@ class TikzMagics(Magics):
         chdir(current_dir)
         
  
-    def _convert_png_to_jpg(self, dir):
+    def _convert_png_to_jpg(self, dir, imagemagick_path):
         current_dir = getcwd()
         chdir(dir)
         
         try:
-            retcode = call("convert tikz.png -quality 100 -background white -flatten tikz.jpg", shell=True)
+            retcode = call("%s tikz.png -quality 100 -background white -flatten tikz.jpg"
+                            % imagemagick_path, shell=True)
             if retcode != 0:
                 print("convert terminated with signal", -retcode, file=sys.stderr)
         except OSError as e:
@@ -206,6 +207,9 @@ class TikzMagics(Magics):
     @argument(
         '-S', '--save', action='store', type=str, default=None,
         help='Save a copy to file, e.g., -S filename. Default is None'
+        )
+    @argument('-i', '--imagemagick', action='store', type=str, default='convert',
+        help='Name of ImageMagick executable, optionally with full path. Default is "convert"'
         )
 
     @needs_local_scope
@@ -257,6 +261,7 @@ class TikzMagics(Magics):
         encoding = args.encoding
         tikz_library = args.library.split(',')
         latex_package = args.package.split(',')
+        imagemagick_path = args.imagemagick
  
         # arguments 'code' in line are prepended to the cell lines
         if cell is None:
@@ -282,7 +287,7 @@ class TikzMagics(Magics):
         
         tex = []
         tex.append('''
-\\documentclass[convert={%(add_params)ssize=%(width)sx%(height)s,outext=.png},border=0pt]{standalone}
+\\documentclass[convert={convertexe={%(imagemagick_path)s},%(add_params)ssize=%(width)sx%(height)s,outext=.png},border=0pt]{standalone}
 \\usepackage{tikz}
         ''' % locals())
         
@@ -327,7 +332,7 @@ class TikzMagics(Magics):
             return
 
         if plot_format == 'jpg' or plot_format == 'jpeg':
-            self._convert_png_to_jpg(plot_dir)
+            self._convert_png_to_jpg(plot_dir, imagemagick_path)
         elif plot_format == 'svg':
             self._convert_pdf_to_svg(plot_dir)
 
