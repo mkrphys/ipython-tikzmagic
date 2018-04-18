@@ -214,6 +214,10 @@ class TikzMagics(Magics):
     @argument('-po', '--pictureoptions', action='store', type=str, default='',
         help='Additional arguments to pass to the \\tikzpicture command.'
         )
+        
+    @argument('--showlatex', action='store_true',
+        help='Show the LATeX file instead of generating image, for debugging LaTeX errors.'
+        )
 
     @needs_local_scope
     @argument(
@@ -323,6 +327,10 @@ class TikzMagics(Magics):
         ''')
         
         code = str('').join(tex)
+        
+        if args.showlatex:
+            print(code)
+            return
 
         latex_log = self._run_latex(code, encoding, plot_dir)
         
