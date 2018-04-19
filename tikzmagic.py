@@ -218,6 +218,14 @@ class TikzMagics(Magics):
     @argument('--showlatex', action='store_true',
         help='Show the LATeX file instead of generating image, for debugging LaTeX errors.'
         )
+        
+    @argument('-ct', '--circuitikz', action='store_true',
+        help='Use CircuiTikZ package instead of regular TikZ.'
+        )
+        
+    @argument('--tikzoptions', action='store', type=str, default='',
+        help='Options to pass when loading TikZ or CircuiTikZ package.'
+        )
 
     @needs_local_scope
     @argument(
@@ -270,6 +278,7 @@ class TikzMagics(Magics):
         latex_package = args.package.split(',')
         imagemagick_path = args.imagemagick
         picture_options = args.pictureoptions
+        tikz_options = args.tikzoptions
  
         # arguments 'code' in line are prepended to the cell lines
         if cell is None:
@@ -293,11 +302,20 @@ class TikzMagics(Magics):
         if plot_format == 'png' or plot_format == 'jpg' or plot_format == 'jpeg':
             add_params += "density=300,"
         
+        # choose between CircuiTikZ and regular Tikz
+        if args.circuitikz:
+            tikz_env = 'circuitikz'
+            tikz_package = 'circuitikz'
+        else:
+            tikz_env = 'tikzpicture'
+            tikz_package = 'tikz'
+            
         tex = []
         tex.append('''
 \\documentclass[convert={convertexe={%(imagemagick_path)s},%(add_params)ssize=%(width)sx%(height)s,outext=.png},border=0pt]{standalone}
-\\usepackage{tikz}
         ''' % locals())
+
+        tex.append('\\usepackage[%(tikz_options)s]{%(tikz_package)s}\n' % locals())
         
         for pkg in latex_package:
             tex.append('''
@@ -316,15 +334,15 @@ class TikzMagics(Magics):
         
         tex.append('''
 \\begin{document}
-\\begin{tikzpicture}[scale=%(scale)s,%(picture_options)s]
+\\begin{%(tikz_env)s}[scale=%(scale)s,%(picture_options)s]
         ''' % locals())
         
         tex.append(code)
         
         tex.append('''
-\\end{tikzpicture}
+\\end{%(tikz_env)s}
 \\end{document}
-        ''')
+        ''' % locals())
         
         code = str('').join(tex)
         
