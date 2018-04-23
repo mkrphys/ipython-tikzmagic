@@ -159,12 +159,13 @@ class TikzMagics(Magics):
         chdir(current_dir)
         
  
-    def _convert_png_to_jpg(self, dir):
+    def _convert_png_to_jpg(self, dir, imagemagick_path):
         current_dir = getcwd()
         chdir(dir)
         
         try:
-            retcode = call("convert tikz.png -quality 100 -background white -flatten tikz.jpg", shell=True)
+            retcode = call("%s tikz.png -quality 100 -background white -flatten tikz.jpg"
+                            % imagemagick_path, shell=True)
             if retcode != 0:
                 print("convert terminated with signal", -retcode, file=sys.stderr)
         except OSError as e:
@@ -193,7 +194,7 @@ class TikzMagics(Magics):
         )
     @argument(
         '-x', '--preamble', action='store', type=str, default='',
-        help='LaTeX preamble to insert before tikz figure, e.g., -x $preamble, with preamble some string variable.'
+        help='LaTeX preamble to insert before tikz figure, e.g., -x "$preamble", with preamble some string variable.'
         )
     @argument(
         '-p', '--package', action='store', type=str, default='',
@@ -206,6 +207,24 @@ class TikzMagics(Magics):
     @argument(
         '-S', '--save', action='store', type=str, default=None,
         help='Save a copy to file, e.g., -S filename. Default is None'
+        )
+    @argument('-i', '--imagemagick', action='store', type=str, default='convert',
+        help='Name of ImageMagick executable, optionally with full path. Default is "convert"'
+        )
+    @argument('-po', '--pictureoptions', action='store', type=str, default='',
+        help='Additional arguments to pass to the \\tikzpicture command.'
+        )
+        
+    @argument('--showlatex', action='store_true',
+        help='Show the LATeX file instead of generating image, for debugging LaTeX errors.'
+        )
+        
+    @argument('-ct', '--circuitikz', action='store_true',
+        help='Use CircuiTikZ package instead of regular TikZ.'
+        )
+        
+    @argument('--tikzoptions', action='store', type=str, default='',
+        help='Options to pass when loading TikZ or CircuiTikZ package.'
         )
 
     @needs_local_scope
@@ -257,6 +276,9 @@ class TikzMagics(Magics):
         encoding = args.encoding
         tikz_library = args.library.split(',')
         latex_package = args.package.split(',')
+        imagemagick_path = args.imagemagick
+        picture_options = args.pictureoptions
+        tikz_options = args.tikzoptions
  
         # arguments 'code' in line are prepended to the cell lines
         if cell is None:
@@ -280,11 +302,20 @@ class TikzMagics(Magics):
         if plot_format == 'png' or plot_format == 'jpg' or plot_format == 'jpeg':
             add_params += "density=300,"
         
+        # choose between CircuiTikZ and regular Tikz
+        if args.circuitikz:
+            tikz_env = 'circuitikz'
+            tikz_package = 'circuitikz'
+        else:
+            tikz_env = 'tikzpicture'
+            tikz_package = 'tikz'
+            
         tex = []
         tex.append('''
-\\documentclass[convert={%(add_params)ssize=%(width)sx%(height)s,outext=.png},border=0pt]{standalone}
-\\usepackage{tikz}
+\\documentclass[convert={convertexe={%(imagemagick_path)s},%(add_params)ssize=%(width)sx%(height)s,outext=.png},border=0pt]{standalone}
         ''' % locals())
+
+        tex.append('\\usepackage[%(tikz_options)s]{%(tikz_package)s}\n' % locals())
         
         for pkg in latex_package:
             tex.append('''
@@ -303,17 +334,21 @@ class TikzMagics(Magics):
         
         tex.append('''
 \\begin{document}
-\\begin{tikzpicture}[scale=%(scale)s]
+\\begin{%(tikz_env)s}[scale=%(scale)s,%(picture_options)s]
         ''' % locals())
         
         tex.append(code)
         
         tex.append('''
-\\end{tikzpicture}
+\\end{%(tikz_env)s}
 \\end{document}
-        ''')
+        ''' % locals())
         
         code = str('').join(tex)
+        
+        if args.showlatex:
+            print(code)
+            return
 
         latex_log = self._run_latex(code, encoding, plot_dir)
         
@@ -327,7 +362,7 @@ class TikzMagics(Magics):
             return
 
         if plot_format == 'jpg' or plot_format == 'jpeg':
-            self._convert_png_to_jpg(plot_dir)
+            self._convert_png_to_jpg(plot_dir, imagemagick_path)
         elif plot_format == 'svg':
             self._convert_pdf_to_svg(plot_dir)
 
