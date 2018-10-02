@@ -35,6 +35,7 @@ or by starting a cell with `%%tikz`, e.g.,
 - `-x` or `--preamble`: LaTeX preamble to insert before tikz figure, default=None
 - `-p` or `--package`: LaTeX packages to load, separated by comma, e.g., `-p pgfplots,textcomp`, default=None
 - `-l` or `--library`: TikZ libraries to load, separated by comma, e.g., `-l matrix,arrows`, default=None
+- `-g` or `--pgfplotslibrary`: Pgfplots libraries to load, separated by comma, e.g., `-l matrix,arrows`, default=None
 - `-S` or `--save`: save a copy to file, e.g., -S filename, default=None
 
 ## Example
