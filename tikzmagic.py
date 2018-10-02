@@ -206,6 +206,10 @@ class TikzMagics(Magics):
         help='TikZ libraries to load, separated by comma, e.g., -l matrix,arrows.'
         )
     @argument(
+        '-g', '--pgfplotslibrary', action='store', type=str, default='',
+        help='Pgfplots libraries to load, separated by comma, e.g., -g fillbetween.'
+        )
+    @argument(
         '-S', '--save', action='store', type=str, default=None,
         help='Save a copy to file, e.g., -S filename. Default is None'
         )
@@ -276,6 +280,7 @@ class TikzMagics(Magics):
         plot_format = args.format
         encoding = args.encoding
         tikz_library = args.library.split(',')
+        pgfplots_library = args.pgfplotslibrary.split(',')
         latex_package = args.package.split(',')
         imagemagick_path = args.imagemagick
         picture_options = args.pictureoptions
@@ -327,6 +332,11 @@ class TikzMagics(Magics):
             tex.append('''
 \\usetikzlibrary{%s}
             ''' % lib)
+
+        for lib in pgfplots_library:
+            tex.append('''
+\\usepgfplotslibrary{%s}
+                    ''' % lib)
 
         if args.preamble is not None:
             tex.append('''
