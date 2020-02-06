@@ -319,41 +319,35 @@ class TikzMagics(Magics):
         tex = []
         tex.append('''
 \\documentclass[convert={convertexe={%(imagemagick_path)s},%(add_params)ssize=%(width)sx%(height)s,outext=.png},border=0pt]{standalone}
-        ''' % locals())
+''' % locals())
 
         tex.append('\\usepackage[%(tikz_options)s]{%(tikz_package)s}\n' % locals())
 
-        for pkg in latex_package:
-            tex.append('''
-\\usepackage{%s}
-            ''' % pkg)
+        if latex_package != [""]:
+            for pkg in latex_package:
+                tex.append("\\usepackage{%s}\n" % pkg)
 
-        for lib in tikz_library:
-            tex.append('''
-\\usetikzlibrary{%s}
-            ''' % lib)
+        if tikz_library != [""]:
+            for lib in tikz_library:
+                tex.append("\\usetikzlibrary{%s}\n" % lib)
 
-        for lib in pgfplots_library:
-            tex.append('''
-\\usepgfplotslibrary{%s}
-                    ''' % lib)
+        if pgfplots_library != [""]:
+            for lib in pgfplots_library:
+                tex.append("\\usepgfplotslibrary{%s}\n" % lib)
 
         if args.preamble is not None:
-            tex.append('''
-%s
-            ''' % args.preamble)
+            tex.append('''%s\n''' % args.preamble)
 
-        tex.append('''
-\\begin{document}
+        tex.append('''\\begin{document}
 \\begin{%(tikz_env)s}[scale=%(scale)s,%(picture_options)s]
-        ''' % locals())
+''' % locals())
 
         tex.append(code)
 
         tex.append('''
 \\end{%(tikz_env)s}
 \\end{document}
-        ''' % locals())
+''' % locals())
 
         code = str('').join(tex)
 
