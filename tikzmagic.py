@@ -31,7 +31,7 @@ import sys
 import tempfile
 from glob import glob
 from os import chdir, getcwd, environ, pathsep
-from subprocess import call
+from subprocess import call, DEVNULL
 from shutil import rmtree, copy
 from xml.dom import minidom
 
@@ -124,7 +124,12 @@ class TikzMagics(Magics):
             # search path (otherwise we would lose access to all packages)
 
         try:
-            retcode = call("pdflatex --shell-escape tikz.tex", shell=True, env=env)
+            # only forward output to the notebook if there's an error
+            retcode = call("pdflatex --shell-escape tikz.tex",
+                           shell=True,
+                           env=env,
+                           stdout=DEVNULL,
+                           stderr=DEVNULL)
             if retcode != 0:
                 print("LaTeX terminated with signal", -retcode, file=sys.stderr)
                 ret_log = True
