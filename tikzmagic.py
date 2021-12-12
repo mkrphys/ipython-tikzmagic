@@ -364,7 +364,7 @@ class TikzMagics(Magics):
             tex.append(
                 dedent(
                     r"""
-                    \definecolor{verydark}{rgb} {0.90,0.01,0.01}
+                    \definecolor{verydark}{rgb} {0.00,0.01,0.01}
                     \tikzset{
                         notquiteblack/.style={color=verydark}
                     }
