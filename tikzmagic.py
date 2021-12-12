@@ -27,6 +27,7 @@ Usage
 #-----------------------------------------------------------------------------
 from __future__ import print_function
 from builtins import str
+import subprocess
 import sys
 import tempfile
 from glob import glob
@@ -34,6 +35,7 @@ from os import chdir, getcwd, environ, pathsep
 from subprocess import call
 from shutil import rmtree, copy
 from xml.dom import minidom
+from textwrap import dedent
 
 from IPython.core.displaypub import publish_display_data
 from IPython.core.magic import (Magics, magics_class, line_magic,
@@ -124,7 +126,11 @@ class TikzMagics(Magics):
             # search path (otherwise we would lose access to all packages)
 
         try:
-            retcode = call("pdflatex --shell-escape tikz.tex", shell=True, env=env)
+            retcode = call("pdflatex --shell-escape tikz.tex",
+                           shell=True,
+                           env=env,
+                           stdout=subprocess.DEVNULL,
+                           stderr=subprocess.DEVNULL)
             if retcode != 0:
                 print("LaTeX terminated with signal", -retcode, file=sys.stderr)
                 ret_log = True
@@ -141,9 +147,12 @@ class TikzMagics(Magics):
             except IOError:
                 print("No log file generated.", file=sys.stderr)
 
-        chdir(current_dir)
+            chdir(current_dir)
+            return log
 
-        return log
+        else:
+            chdir(current_dir)
+            return None
 
 
     def _convert_pdf_to_svg(self, dir):
@@ -231,6 +240,14 @@ class TikzMagics(Magics):
     @argument('--tikzoptions', action='store', type=str, default='',
         help='Options to pass when loading TikZ or CircuiTikZ package.'
         )
+    @argument(
+        "--rgbworkaround",
+        action="store_true",
+        help=(
+            "Embed code in a style that sets the color from black to a very dark blue, "
+            "this tricks imagemagick into not converting to grayscale"
+        ),
+    )
 
     @needs_local_scope
     @argument(
@@ -285,6 +302,7 @@ class TikzMagics(Magics):
         imagemagick_path = args.imagemagick
         picture_options = args.pictureoptions
         tikz_options = args.tikzoptions
+        rgbworkaround = args.rgbworkaround
 
         # arguments 'code' in line are prepended to the cell lines
         if cell is None:
@@ -342,7 +360,23 @@ class TikzMagics(Magics):
 \\begin{%(tikz_env)s}[scale=%(scale)s,%(picture_options)s]
 ''' % locals())
 
+        if rgbworkaround:
+            tex.append(
+                dedent(
+                    r"""
+                    \definecolor{verydark}{rgb} {0.90,0.01,0.01}
+                    \tikzset{
+                        notquiteblack/.style={color=verydark}
+                    }
+                    \begin{scope}[notquiteblack]
+                    """
+                )
+            )
+
         tex.append(code)
+
+        if rgbworkaround:
+            tex.append("\\end{scope}\n")
 
         tex.append('''
 \\end{%(tikz_env)s}
