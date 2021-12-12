@@ -142,12 +142,9 @@ class TikzMagics(Magics):
             except IOError:
                 print("No log file generated.", file=sys.stderr)
 
-            chdir(current_dir)
-            return log
+        chdir(current_dir)
 
-        else:
-            chdir(current_dir)
-            return None
+        return log
 
 
     def _convert_pdf_to_svg(self, dir):
