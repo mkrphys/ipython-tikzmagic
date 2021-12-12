@@ -27,7 +27,6 @@ Usage
 #-----------------------------------------------------------------------------
 from __future__ import print_function
 from builtins import str
-import subprocess
 import sys
 import tempfile
 from glob import glob
@@ -126,11 +125,7 @@ class TikzMagics(Magics):
             # search path (otherwise we would lose access to all packages)
 
         try:
-            retcode = call("pdflatex --shell-escape tikz.tex",
-                           shell=True,
-                           env=env,
-                           stdout=subprocess.DEVNULL,
-                           stderr=subprocess.DEVNULL)
+            retcode = call("pdflatex --shell-escape tikz.tex", shell=True, env=env)
             if retcode != 0:
                 print("LaTeX terminated with signal", -retcode, file=sys.stderr)
                 ret_log = True
