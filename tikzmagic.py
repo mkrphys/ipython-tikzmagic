@@ -227,6 +227,9 @@ class TikzMagics(Magics):
     @argument('-ct', '--circuitikz', action='store_true',
         help='Use CircuiTikZ package instead of regular TikZ.'
         )
+    @argument('-eu', '--tkz-euclide', action='store_true',
+        help='Use tkz-euclide package instead of regular TikZ.'
+        )
 
     @argument('--tikzoptions', action='store', type=str, default='',
         help='Options to pass when loading TikZ or CircuiTikZ package.'
@@ -312,6 +315,9 @@ class TikzMagics(Magics):
         if args.circuitikz:
             tikz_env = 'circuitikz'
             tikz_package = 'circuitikz'
+        elif args.tkz_euclide:
+            tikz_env = 'tikzpicture'
+            tikz_package = 'tkz-euclide'
         else:
             tikz_env = 'tikzpicture'
             tikz_package = 'tikz'
