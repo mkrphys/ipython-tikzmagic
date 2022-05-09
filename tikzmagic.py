@@ -296,7 +296,11 @@ class TikzMagics(Magics):
         pgfplots_library = args.pgfplotslibrary.split(',')
         latex_package = args.package.split(',')
         imagemagick_path = args.imagemagick
-        picture_options = args.pictureoptions
+        p_o = args.pictureoptions
+        # strip delimiters
+        if p_o and p_o[0] in "'\"" and p_o[0] == p_o[-1] and p_o[0] not in p_o[1:-1]:
+            p_o = p_o[1:-1]
+        picture_options = p_o
         tikz_options = args.tikzoptions
 
         # arguments 'code' in line are prepended to the cell lines
