@@ -245,7 +245,7 @@ class TikzMagics(Magics):
         )
 
     @argument('--tikzoptions', action='store', type=str, default='',
-        help='Options to pass when loading TikZ or CircuiTikZ package.'
+        help='Options to pass when loading TikZ. CircuiTikZ, or QuanTikZ packages.'
         )
 
     @needs_local_scope
@@ -330,7 +330,7 @@ class TikzMagics(Magics):
             tikz_package = 'circuitikz'
         elif args.quantikz:
             tikz_env = 'quantikz'
-            tikz_package = 'quantikz'
+            tikz_package = 'tikz'
         elif args.tkz_euclide:
             tikz_env = 'tikzpicture'
             tikz_package = 'tkz-euclide'
