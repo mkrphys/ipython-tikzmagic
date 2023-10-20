@@ -226,7 +226,7 @@ class TikzMagics(Magics):
     @argument('-i', '--imagemagick', action='store', type=str, default='convert',
         help='Name of ImageMagick executable, optionally with full path. Default is "convert"'
         )
-    @argument('-po', '--pictureoptions', action='store', type=str, default='',
+    @argument('-po', '--pictureoptions', action='store', type=str, default='', nargs='*',
         help='Additional arguments to pass to the \\tikzpicture command.'
         )
 
@@ -360,11 +360,13 @@ class TikzMagics(Magics):
         if args.preamble is not None:
             tex.append('''%s\n''' % args.preamble)
 
-        if scale  == 1:
-            tex.append('''\\begin{document}\n\\begin{%(tikz_env)s}[%(picture_options)s]\n''' % locals())
-        else:
-            tex.append('''\\begin{document}\n\\begin{%(tikz_env)s}[scale=%(scale)s,%(picture_options)s]\n''' % locals())
 
+        tex.append('''\\begin{document}\n\\begin{%(tikz_env)s}['''  % locals())
+        if scale != 1:
+             tex.append('''scale=%(scale)s,'''% locals())
+        for picture_option in picture_options:
+            tex.append('''%(picture_option)s '''  % locals())
+        tex.append(''']\n''')
         tex.append(code)
 
         if code[-1] != '\n':
