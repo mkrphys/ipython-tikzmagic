@@ -366,8 +366,9 @@ class TikzMagics(Magics):
 
         tex.append(code)
 
-        tex.append('''
-\\end{%(tikz_env)s}
+        if code[-1] != '\n':
+            tex.append('\n')
+        tex.append('''\\end{%(tikz_env)s}
 \\end{document}
 ''' % locals())
 
