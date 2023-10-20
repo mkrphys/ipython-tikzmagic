@@ -360,10 +360,10 @@ class TikzMagics(Magics):
         if args.preamble is not None:
             tex.append('''%s\n''' % args.preamble)
 
-        if scale is not None:
-            tex.append('''\\begin{document}\n\\begin{%(tikz_env)s}[scale=%(scale)s,%(picture_options)s]''' % locals())
-        else:
+        if scale  == 1:
             tex.append('''\\begin{document}\n\\begin{%(tikz_env)s}[%(picture_options)s]''' % locals())
+        else:
+            tex.append('''\\begin{document}\n\\begin{%(tikz_env)s}[scale=%(scale)s,%(picture_options)s]''' % locals())
 
         tex.append(code)
 
