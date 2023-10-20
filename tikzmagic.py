@@ -331,7 +331,7 @@ class TikzMagics(Magics):
         elif args.quantikz:
             tikz_env = 'quantikz'
             tikz_package = 'tikz'
-            library.append('quantikz')
+            tikz_library.append('quantikz')
         elif args.tkz_euclide:
             tikz_env = 'tikzpicture'
             tikz_package = 'tkz-euclide'
