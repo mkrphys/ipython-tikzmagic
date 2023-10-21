@@ -204,7 +204,7 @@ class TikzMagics(Magics):
         help='Text encoding, e.g., -e utf-8.'
         )
     @argument(
-        '-x', '--preamble', action='store', type=str, default='',
+        '-x', '--preamble', action='store', type=str, default='',nargs='*',
         help='LaTeX preamble to insert before tikz figure, e.g., -x "$preamble", with preamble some string variable.'
         )
     @argument(
@@ -359,7 +359,9 @@ class TikzMagics(Magics):
                 tex.append("\\usepgfplotslibrary{%s}\n" % lib)
 
         if args.preamble is not None:
-            tex.append('''%s\n''' % args.preamble)
+            # tex.append('''%s\n''' % args.preamble)
+            for preamble in args.preamble:
+                tex.append('''%(preamble)s '''  % locals())
 
 
         tex.append('''\\begin{document}\n\\begin{%(tikz_env)s}['''  % locals())
