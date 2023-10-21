@@ -331,7 +331,10 @@ class TikzMagics(Magics):
         elif args.quantikz:
             tikz_env = 'quantikz'
             tikz_package = 'tikz'
-            tikz_library.append('quantikz')
+            if tikz_library != [""]:
+                tikz_library.append('quantikz')
+            else:
+                tikz_library = ['quantikz']
         elif args.tkz_euclide:
             tikz_env = 'tikzpicture'
             tikz_package = 'tkz-euclide'
@@ -359,9 +362,9 @@ class TikzMagics(Magics):
                 tex.append("\\usepgfplotslibrary{%s}\n" % lib)
 
         if args.preamble is not None:
-            # tex.append('''%s\n''' % args.preamble)
             for preamble in args.preamble:
                 tex.append('''%(preamble)s '''  % locals())
+            tex.append('\n')
 
 
         tex.append('''\\begin{document}\n\\begin{%(tikz_env)s}['''  % locals())
