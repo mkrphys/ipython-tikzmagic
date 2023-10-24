@@ -204,7 +204,7 @@ class TikzMagics(Magics):
         help='Text encoding, e.g., -e utf-8.'
         )
     @argument(
-        '-x', '--preamble', action='store', type=str, default='',
+        '-x', '--preamble', action='store', type=str, default='',nargs='*',
         help='LaTeX preamble to insert before tikz figure, e.g., -x "$preamble", with preamble some string variable.'
         )
     @argument(
@@ -226,7 +226,7 @@ class TikzMagics(Magics):
     @argument('-i', '--imagemagick', action='store', type=str, default='convert',
         help='Name of ImageMagick executable, optionally with full path. Default is "convert"'
         )
-    @argument('-po', '--pictureoptions', action='store', type=str, default='',
+    @argument('-po', '--pictureoptions', action='store', type=str, default='', nargs='*',
         help='Additional arguments to pass to the \\tikzpicture command.'
         )
 
@@ -237,12 +237,15 @@ class TikzMagics(Magics):
     @argument('-ct', '--circuitikz', action='store_true',
         help='Use CircuiTikZ package instead of regular TikZ.'
         )
+    @argument('-qt', '--quantikz', action='store_true',
+        help='Use QuanTikZ package instead of regular TikZ.'
+        )
     @argument('-eu', '--tkz-euclide', action='store_true',
         help='Use tkz-euclide package instead of regular TikZ.'
         )
 
     @argument('--tikzoptions', action='store', type=str, default='',
-        help='Options to pass when loading TikZ or CircuiTikZ package.'
+        help='Options to pass when loading TikZ. CircuiTikZ, or QuanTikZ packages.'
         )
 
     @needs_local_scope
@@ -325,6 +328,13 @@ class TikzMagics(Magics):
         if args.circuitikz:
             tikz_env = 'circuitikz'
             tikz_package = 'circuitikz'
+        elif args.quantikz:
+            tikz_env = 'quantikz'
+            tikz_package = 'tikz'
+            if tikz_library != [""]:
+                tikz_library.append('quantikz')
+            else:
+                tikz_library = ['quantikz']
         elif args.tkz_euclide:
             tikz_env = 'tikzpicture'
             tikz_package = 'tkz-euclide'
@@ -352,16 +362,22 @@ class TikzMagics(Magics):
                 tex.append("\\usepgfplotslibrary{%s}\n" % lib)
 
         if args.preamble is not None:
-            tex.append('''%s\n''' % args.preamble)
+            for preamble in args.preamble:
+                tex.append('''%(preamble)s '''  % locals())
+            tex.append('\n')
 
-        tex.append('''\\begin{document}
-\\begin{%(tikz_env)s}[scale=%(scale)s,%(picture_options)s]
-''' % locals())
 
+        tex.append('''\\begin{document}\n\\begin{%(tikz_env)s}['''  % locals())
+        if scale != 1:
+             tex.append('''scale=%(scale)s,'''% locals())
+        for picture_option in picture_options:
+            tex.append('''%(picture_option)s '''  % locals())
+        tex.append(''']\n''')
         tex.append(code)
 
-        tex.append('''
-\\end{%(tikz_env)s}
+        if code[-1] != '\n':
+            tex.append('\n')
+        tex.append('''\\end{%(tikz_env)s}
 \\end{document}
 ''' % locals())
 
